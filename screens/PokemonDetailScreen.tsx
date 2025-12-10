@@ -1,4 +1,4 @@
-// screens/PokemonDetailScreen.tsx
+
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useEffect, useState } from "react";
 import {
@@ -23,10 +23,9 @@ const { width } = Dimensions.get("window");
 export const PokemonDetailScreen: React.FC<Props> = ({ route, navigation }) => {
   const { pokemon } = route.params;
 
-  // Глобальные шаги из expo-sensors
+
   const { steps, powerLevel: globalPowerLevel, stepsToNext } = useGlobalSteps();
 
-  // Локальное состояние для этого покемона
   const [localPowerLevel, setLocalPowerLevel] = useState(0);
   const [previousLevel, setPreviousLevel] = useState(0);
   const [showPowerUp, setShowPowerUp] = useState(false);
@@ -34,7 +33,7 @@ export const PokemonDetailScreen: React.FC<Props> = ({ route, navigation }) => {
   const primaryType = pokemon.types[0]?.type.name || "normal";
   const typeColors = TYPE_COLORS[primaryType] || TYPE_COLORS.normal;
 
-  // Загружаем сохранённый уровень покемона из AsyncStorage
+  
   useEffect(() => {
     const loadSavedPower = async () => {
       const saved = await getPokemonPower(pokemon.id);
@@ -42,7 +41,7 @@ export const PokemonDetailScreen: React.FC<Props> = ({ route, navigation }) => {
         setLocalPowerLevel(saved.powerLevel);
         setPreviousLevel(saved.powerLevel);
       } else {
-        // Если не было сохранено — берём текущий глобальный уровень
+        
         setLocalPowerLevel(globalPowerLevel);
         setPreviousLevel(globalPowerLevel);
       }
@@ -51,14 +50,14 @@ export const PokemonDetailScreen: React.FC<Props> = ({ route, navigation }) => {
     loadSavedPower();
   }, [pokemon.id, globalPowerLevel]);
 
-  // Отслеживаем рост глобального уровня → прокачиваем покемона
+ 
   useEffect(() => {
     if (globalPowerLevel > previousLevel) {
       setShowPowerUp(true);
       setLocalPowerLevel(globalPowerLevel);
       setPreviousLevel(globalPowerLevel);
 
-      // Сохраняем прогресс для этого покемона
+   
       savePokemonPower(pokemon.id, globalPowerLevel, steps);
     }
   }, [globalPowerLevel, previousLevel, pokemon.id]);
@@ -97,7 +96,7 @@ export const PokemonDetailScreen: React.FC<Props> = ({ route, navigation }) => {
           />
         </View>
 
-        {/* Power Level Section */}
+       
         <View style={styles.powerSection}>
           <Text style={styles.sectionTitle}>Power Level</Text>
           <View style={styles.powerCard}>
@@ -123,7 +122,7 @@ export const PokemonDetailScreen: React.FC<Props> = ({ route, navigation }) => {
           </View>
         </View>
 
-        {/* Types */}
+     
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Types</Text>
           <View style={styles.typesRow}>
@@ -143,7 +142,7 @@ export const PokemonDetailScreen: React.FC<Props> = ({ route, navigation }) => {
           </View>
         </View>
 
-        {/* Base Stats */}
+       
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Base Stats</Text>
           {pokemon.stats.map((stat) => {
@@ -170,7 +169,7 @@ export const PokemonDetailScreen: React.FC<Props> = ({ route, navigation }) => {
           })}
         </View>
 
-        {/* Physical Info */}
+    
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Physical Info</Text>
           <View style={styles.infoRow}>
@@ -189,7 +188,7 @@ export const PokemonDetailScreen: React.FC<Props> = ({ route, navigation }) => {
           </View>
         </View>
 
-        {/* Abilities */}
+    
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Abilities</Text>
           {pokemon.abilities.map((a) => (
