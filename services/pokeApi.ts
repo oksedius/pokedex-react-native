@@ -22,7 +22,7 @@ export const fetchPokemonDetails = async (url: string): Promise<Pokemon> => {
 
 
 export const fetchPokemonById = async (id: number): Promise<Pokemon> => {
-  const response = await fetch(`${BASE_URL}/pokemon/${id}/`); // ← ВОТ ТУТ БЫЛ СЛЕШ!
+  const response = await fetch(`${BASE_URL}/pokemon/${id}/`); 
 
   if (!response.ok) {
     throw new Error(`Failed to fetch pokemon ${id}`);
