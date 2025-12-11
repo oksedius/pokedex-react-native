@@ -33,15 +33,14 @@ export const useGlobalSteps = () => {
         buffer.push(magnitude);
         if (buffer.length > 10) buffer.shift();
 
-        // сглаживание (скользящее среднее)
+     
         const avg = buffer.reduce((a, b) => a + b, 0) / buffer.length;
 
-        // вычисляем адаптивный порог
+
         const dynamicThreshold = avg + (PEAK_THRESHOLD - 1);
 
         const now = Date.now();
 
-        // если значение превысило порог — шаг
         if (magnitude > dynamicThreshold) {
           if (now - lastPeakTime > MIN_STEP_DELAY) {
             lastPeakTime = now;
