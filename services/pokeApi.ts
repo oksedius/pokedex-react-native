@@ -1,9 +1,6 @@
-
-
 import { Pokemon, PokemonListItem } from "../types";
 
 const BASE_URL = "https://pokeapi.co/api/v2";
-
 
 export const fetchPokemonList = async (
   limit: number = 151
@@ -14,16 +11,15 @@ export const fetchPokemonList = async (
   return data.results;
 };
 
-
+// Работает — по URL (всё ок, потому что url из results уже со слешем)
 export const fetchPokemonDetails = async (url: string): Promise<Pokemon> => {
   const response = await fetch(url);
   if (!response.ok) throw new Error("Failed to fetch pokemon details");
   return response.json();
 };
 
-
 export const fetchPokemonById = async (id: number): Promise<Pokemon> => {
-  const response = await fetch(`${BASE_URL}/pokemon/${id}/`); 
+  const response = await fetch(`${BASE_URL}/pokemon/${id}/`);
 
   if (!response.ok) {
     throw new Error(`Failed to fetch pokemon ${id}`);
@@ -32,7 +28,7 @@ export const fetchPokemonById = async (id: number): Promise<Pokemon> => {
   return response.json();
 };
 
-
+// Оставь как есть
 export const getPokemonIdFromUrl = (url: string): number => {
   const parts = url.split("/").filter(Boolean);
   return parseInt(parts[parts.length - 1], 10);
