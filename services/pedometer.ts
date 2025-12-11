@@ -1,48 +1,55 @@
-// src/services/pedometer.ts
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Pedometer } from "expo-sensors";
+import { Accelerometer } from "expo-sensors";
 import { useEffect, useState } from "react";
 
-// Ключ для хранения общего количества шагов за всё время
-const TOTAL_STEPS_KEY = "pokemon_app_total_steps";
-
-// 100 шагов = +1 уровень
 export const STEPS_PER_LEVEL = 100;
 
-export const calculatePowerLevel = (totalSteps: number): number => {
-  return Math.floor(totalSteps / STEPS_PER_LEVEL);
-};
+let stepCount = 0;
+let lastPeakTime = 0;
+let buffer: number[] = [];
+let lastAvg = 0;
 
-export const getStepsToNextLevel = (totalSteps: number): number => {
-  return STEPS_PER_LEVEL - (totalSteps % STEPS_PER_LEVEL);
-};
+const PEAK_THRESHOLD = 1.15;
+const MIN_STEP_DELAY = 300;
 
-// Хук — используй его в любом экране
 export const useGlobalSteps = () => {
   const [steps, setSteps] = useState(0);
-  const [isAvailable, setIsAvailable] = useState(true);
 
   useEffect(() => {
-    let subscription: { remove: () => void } | null = null;
+    let subscription: any;
 
     const init = async () => {
-      const available = await Pedometer.isAvailableAsync();
-      setIsAvailable(available);
+      const saved = await AsyncStorage.getItem("totalSteps");
+      if (saved) {
+        stepCount = parseInt(saved, 10);
+        setSteps(stepCount);
+      }
 
-      if (!available) return;
+      Accelerometer.setUpdateInterval(100);
 
-      // Загружаем накопленные шаги
-      const saved = await AsyncStorage.getItem(TOTAL_STEPS_KEY);
-      const initialSteps = saved ? parseInt(saved, 10) : 0;
-      setSteps(initialSteps);
+      subscription = Accelerometer.addListener(({ x, y, z }) => {
+        const magnitude = Math.sqrt(x * x + y * y + z * z);
 
-      // Слушаем новые шаги
-      subscription = Pedometer.watchStepCount((result) => {
-        setSteps((prev) => {
-          const newTotal = prev + result.steps; // result.steps === 1 при каждом шаге
-          AsyncStorage.setItem(TOTAL_STEPS_KEY, newTotal.toString());
-          return newTotal;
-        });
+        buffer.push(magnitude);
+        if (buffer.length > 10) buffer.shift();
+
+        const avg = buffer.reduce((a, b) => a + b, 0) / buffer.length;
+
+        const dynamicThreshold = avg + (PEAK_THRESHOLD - 1);
+
+        const now = Date.now();
+
+        if (magnitude > dynamicThreshold) {
+          if (now - lastPeakTime > MIN_STEP_DELAY) {
+            lastPeakTime = now;
+
+            stepCount++;
+            setSteps(stepCount);
+            AsyncStorage.setItem("totalSteps", stepCount.toString());
+          }
+        }
+
+        lastAvg = avg;
       });
     };
 
@@ -53,8 +60,9 @@ export const useGlobalSteps = () => {
     };
   }, []);
 
-  const powerLevel = calculatePowerLevel(steps);
-  const stepsToNext = getStepsToNextLevel(steps);
-
-  return { steps, powerLevel, stepsToNext, isAvailable };
+  return {
+    steps,
+    powerLevel: Math.floor(steps / STEPS_PER_LEVEL),
+    stepsToNext: STEPS_PER_LEVEL - (steps % STEPS_PER_LEVEL),
+  };
 };

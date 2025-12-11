@@ -5,7 +5,6 @@ export default function App() {
   return (
     <>
       <StatusBar barStyle="light-content" backgroundColor="#EF5350" />
-
       <AppNavigator />
     </>
   );

@@ -1,4 +1,3 @@
-// screens/PokemonListScreen.tsx
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import React, { useCallback, useEffect, useState } from "react";
 import { FlatList, RefreshControl, StyleSheet, Text, View } from "react-native";
@@ -6,7 +5,7 @@ import { FlatList, RefreshControl, StyleSheet, Text, View } from "react-native";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { PokemonCard } from "../components/PokemonCard";
 import { useGlobalSteps } from "../services/pedometer";
-import { fetchPokemonDetails, fetchPokemonList } from "../services/pokeApi"; // ← используем правильную функцию!
+import { fetchPokemonDetails, fetchPokemonList } from "../services/pokeApi"; // ←
 import { getAllPokemonPowers } from "../services/storage";
 import { Pokemon, RootStackParamList } from "../types";
 
@@ -29,13 +28,11 @@ export const PokemonListScreen: React.FC<Props> = ({ navigation }) => {
     {}
   );
 
-  // Правильная загрузка — используем URL из списка!
   const loadPokemons = useCallback(async () => {
     try {
       const list = await fetchPokemonList(151);
       const first20 = list.slice(0, 20);
 
-      // Используем готовую функцию, которая сама добавляет слеш!
       const details = await Promise.all(
         first20.map((item) => fetchPokemonDetails(item.url))
       );
@@ -87,7 +84,7 @@ export const PokemonListScreen: React.FC<Props> = ({ navigation }) => {
     [pokemonPowers, globalPowerLevel, handlePress]
   );
 
-  if (loading) return <LoadingSpinner message="Загружаем покемонов..." />;
+  if (loading) return <LoadingSpinner message="Loading pokemon's..." />;
 
   return (
     <View style={styles.container}>
